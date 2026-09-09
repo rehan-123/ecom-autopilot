@@ -1,0 +1,15 @@
+# Scenario deltas, expressed as multipliers/offsets on the expected case so
+# that what differs between scenarios is explicit and versioned rather than a
+# set of hand-picked numbers.
+kind: "scenario_profile:BEST"
+version: "policy-2026.08"
+effective_from: "2026-08-01T00:00:00+00:00"
+effective_to: null
+source: "operator policy"
+last_verified_at: "2026-08-23T00:00:00+00:00"
+payload:
+  return_rate_multiplier: 0.6
+  supplier_cost_delta_pct: -3
+  shipping_delta_pct: -3
+  ad_cost_multiplier: 0.8
+  velocity_multiplier: 1.25

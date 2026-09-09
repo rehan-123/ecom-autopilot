@@ -1,0 +1,32 @@
+# Marketplace fee schedule - TEMPLATE, NOT VERIFIED DATA.
+#
+# `last_verified_at: null` marks this UNVERIFIED. The decision engine refuses
+# to emit PASS for any assessment pinned to an unverified reference, so this
+# file is safe to ship but cannot silently produce a business decision.
+#
+# To use: enter the published figures from the marketplace's own rate card,
+# set `source` to that page, and set `last_verified_at` to the date you
+# checked it. Re-verify at least every 90 days.
+kind: "rate_card:flipkart"
+version: "template-0"
+effective_from: "2020-01-01T00:00:00+00:00"
+effective_to: null
+source: null
+last_verified_at: null
+payload:
+  currency: INR
+  # Commission by category. Enter real slabs before relying on this.
+  commission_pct_by_category:
+    default: 0
+  # Flat fee applied per order, by selling-price band.
+  fixed_fee_bands:
+    - max_price: 0
+      fee: 0
+  # Payment collection fee as a percentage of the order value.
+  collection_fee_pct: 0
+  # Shipping by weight band. Enter the real weight x zone matrix.
+  shipping_by_weight_g:
+    - max_weight_g: 0
+      fee: 0
+  # GST charged by the marketplace on its own fees (recoverable as ITC).
+  gst_on_fees_pct: 0

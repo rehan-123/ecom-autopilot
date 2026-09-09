@@ -1,0 +1,24 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+*.egg-info/
+
+# Local database and its WAL sidecars. Never commit a ledger.
+data/*.db
+data/*.db-wal
+data/*.db-shm
+!data/.gitkeep
+
+.env
+.DS_Store
+
+# validation artefacts
+.venv-validate/
+.mutation_scratch*/
+.ruff_cache/
+
+# reference data is source, not artefacts - keep it
+!data/reference/
+.hypothesis/

@@ -1,0 +1,14 @@
+# TEST FIXTURE - invented figures.
+kind: tax_table
+version: "fixture-1"
+effective_from: "2020-01-01T00:00:00+00:00"
+effective_to: null
+source: "test fixture"
+last_verified_at: "2026-08-23T00:00:00+00:00"
+payload:
+  default_gst_rate_pct: 18
+  tcs_rate_pct: 0.5
+  gst_rate_pct_by_hsn:
+    "8510": 18
+    "3924": 12
+  cess_pct_by_hsn: {}

@@ -1,0 +1,55 @@
+# Configuration for Part 1 — Intelligence & Product Engine.
+#
+# Business rules live here as data, never as constants in code. Changing a
+# threshold must not require a code change, and must not silently reinterpret
+# historical decisions — which is why every assessment pins the version of the
+# profile it used.
+#
+# NOTE ON SAFETY: this file contains no `allow_purchase` or
+# `allow_marketplace_publish` flag. A flag implies a code path on the other
+# side of it. There is no purchasing code and no marketplace write client in
+# this repository, so there is nothing to switch on. Absence of capability is
+# the guarantee; configuration is not.
+
+schema_version: 1
+
+database:
+  path: data/ecom_autopilot.db
+  # WAL so replay and projection reads proceed during appends.
+  journal_mode: WAL
+
+ledger:
+  # Verify the hash chain before replaying. Replaying a tampered ledger
+  # produces a confident wrong answer, which is worse than an error.
+  verify_chain_on_replay: true
+  genesis_hash: "0000000000000000000000000000000000000000000000000000000000000000"
+
+reference_data:
+  # An assessment resting on a reference row older than this is downgraded to
+  # REQUIRES_HUMAN_REVIEW. "No matching rule" only means something when the
+  # rulebook is current — BIS and QCO lists change by notification.
+  max_reference_age_days: 90
+
+# Thresholds below are STARTING VALUES for later milestones, seeded as
+# versioned reference data rather than read directly by calculation code.
+# Deliberately not populated with invented marketplace rates.
+threshold_profiles:
+  - name: low_risk
+    version: "2026.08-initial"
+    min_net_margin_pct: 22
+    min_price_headroom_pct: 10
+    min_coverage_pct: 60
+  - name: medium_risk
+    version: "2026.08-initial"
+    min_net_margin_pct: 30
+    min_price_headroom_pct: 10
+    min_coverage_pct: 60
+  - name: high_return
+    version: "2026.08-initial"
+    min_net_margin_pct: 45
+    min_price_headroom_pct: 15
+    min_coverage_pct: 70
+
+logging:
+  level: INFO
+  format: "%(asctime)s %(levelname)-7s %(name)-28s %(message)s"

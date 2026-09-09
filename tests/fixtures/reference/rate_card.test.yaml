@@ -1,0 +1,23 @@
+# TEST FIXTURE - invented figures for exercising the calculator.
+# Not a claim about any real marketplace's fees.
+kind: "rate_card:test_marketplace"
+version: "fixture-1"
+effective_from: "2020-01-01T00:00:00+00:00"
+effective_to: null
+source: "test fixture"
+last_verified_at: "2026-08-23T00:00:00+00:00"
+payload:
+  currency: INR
+  commission_pct_by_category:
+    default: 5
+    personal_care_electrical: 8
+  fixed_fee_bands:
+    - {max_price: 500, fee: 10}
+    - {max_price: 1000, fee: 25}
+    - {max_price: 100000, fee: 45}
+  collection_fee_pct: 2
+  shipping_by_weight_g:
+    - {max_weight_g: 500, fee: 60}
+    - {max_weight_g: 1000, fee: 85}
+    - {max_weight_g: 100000, fee: 140}
+  gst_on_fees_pct: 18

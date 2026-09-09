@@ -1,0 +1,15 @@
+# Return / RTO benchmarks - TEMPLATE, NOT VERIFIED DATA.
+# Replace with your own settlement history as soon as you have it; that is
+# the only source that is genuinely about your catalogue.
+kind: "return_benchmark:default"
+version: "template-0"
+effective_from: "2020-01-01T00:00:00+00:00"
+effective_to: null
+source: null
+last_verified_at: null
+payload:
+  return_rate_pct: 0
+  rto_rate_pct: 0
+  cost_per_return_inr: 0
+  unsaleable_share_pct: 0
+  confidence: UNVERIFIED

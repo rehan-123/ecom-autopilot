@@ -1,0 +1,56 @@
+# Compliance ruleset - STRUCTURE VERIFIED, CONTENT REQUIRES YOUR VERIFICATION.
+#
+# `last_verified_at: null` marks this UNVERIFIED, so the engine downgrades any
+# clean result to REQUIRES_HUMAN_REVIEW. That is deliberate: shipping a
+# regulatory list that looks authoritative but has never been checked against
+# the source would be worse than shipping none.
+#
+# Before use: confirm each entry against the issuing authority's own
+# publication, add the source URL, and set last_verified_at.
+kind: "compliance_ruleset:india"
+version: "baseline-0"
+effective_from: "2020-01-01T00:00:00+00:00"
+effective_to: null
+source: "TEST FIXTURE - not a real regulatory citation"
+last_verified_at: "2026-08-23T00:00:00+00:00"
+payload:
+  jurisdiction: IN
+  requirements:
+    - id: BIS_ISI_SMALL_APPLIANCE
+      hsn_prefix: ["8509", "8510", "8516"]
+      keywords: ["hand blender", "immersion blender", "mixer grinder",
+                 "electric iron", "room heater", "trimmer", "kettle"]
+      requirement: VALID_BIS_LICENCE
+      evidence_required: [bis_licence_number, manufacturer_name, licence_valid_until]
+      severity: BLOCKING
+      note: >
+        Small domestic electricals are subject to mandatory certification.
+        Verify scope and the current list against BIS before listing.
+
+    - id: BIS_TOYS
+      hsn_prefix: ["9503"]
+      keywords: ["toy", "doll", "puzzle"]
+      requirement: VALID_BIS_LICENCE
+      evidence_required: [bis_licence_number, licence_valid_until]
+      severity: BLOCKING
+
+    - id: LEGAL_METROLOGY_PACKAGED
+      hsn_prefix: []
+      keywords: ["pack", "packet", "bottle", "combo", "set"]
+      requirement: PACKAGED_COMMODITY_DECLARATIONS
+      evidence_required:
+        [country_of_origin, manufacturer_address, net_quantity, mrp,
+         month_year_of_manufacture, consumer_care_contact]
+      severity: BLOCKING
+      note: >
+        Declarations must appear on the package and in the online listing.
+
+    - id: BRAND_AUTHORISATION
+      hsn_prefix: []
+      keywords: []
+      requirement: BRAND_AUTHORISATION_LETTER
+      evidence_required: [brand_authorisation_reference]
+      severity: WARNING
+      note: >
+        Applies whenever a branded good is listed. Fuzzy matching cannot
+        detect this reliably, so it is advisory and routes to human review.

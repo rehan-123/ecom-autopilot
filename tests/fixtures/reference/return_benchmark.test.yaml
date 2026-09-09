@@ -1,0 +1,13 @@
+# TEST FIXTURE - invented figures.
+kind: "return_benchmark:personal_care_electrical"
+version: "fixture-1"
+effective_from: "2020-01-01T00:00:00+00:00"
+effective_to: null
+source: "test fixture"
+last_verified_at: "2026-08-23T00:00:00+00:00"
+payload:
+  return_rate_pct: 10
+  rto_rate_pct: 5
+  cost_per_return_inr: 150
+  unsaleable_share_pct: 40
+  confidence: FIXTURE

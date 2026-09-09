@@ -1,0 +1,193 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ecom-autopilot"
+version = "0.1.0"
+description = "Part 1 Milestone 1 — data model, SQLite persistence, immutable event ledger"
+readme = "README.md"
+requires-python = ">=3.12"
+
+# Runtime dependencies. Floors are set to the first releases publishing
+# wheels for Python 3.13/3.14; older pins resolve but build from source.
+dependencies = [
+    "pydantic>=2.11,<3",
+    "SQLAlchemy>=2.0.41,<3",
+    "PyYAML>=6.0.2",      # versioned reference data
+    "openpyxl>=3.1.5",    # .xlsx supplier catalogues
+    "pypdf>=5.1",         # .pdf supplier price lists
+]
+
+[project.optional-dependencies]
+# The HTTP application layer. Optional so the CLI and engines keep working
+# without it, and so an offline install stays small.
+api = [
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.30",
+]
+dev = [
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.30",
+    "httpx>=0.27",        # FastAPI's TestClient transport
+    "pytest>=8.3",
+    "hypothesis>=6.100",  # property tests over the money arithmetic
+    "ruff>=0.6",
+]
+
+[project.scripts]
+ecom-autopilot = "main:main"
+
+[tool.setuptools]
+packages = [
+    "api",
+    "catalog",
+    "compliance",
+    "database",
+    "decisions",
+    "discovery",
+    "econ",
+    "execution",
+    "ledger",
+    "marketplace",
+    "llm",
+    "part2",
+    "reference",
+    "reports",
+    "research",
+    "signals",
+    "research", "sourcing",
+    "sources",
+]
+
+# --------------------------------------------------------------------------
+# pytest
+# --------------------------------------------------------------------------
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+addopts = [
+    "-q",
+    "--strict-markers",
+    "--strict-config",
+    # Any collection error is a hard failure. Without this a missing
+    # dependency can surface as "0 tests collected" rather than a red suite.
+    "--import-mode=importlib",
+]
+filterwarnings = ["error::DeprecationWarning:catalog.*"]
+
+# --------------------------------------------------------------------------
+# ruff
+# --------------------------------------------------------------------------
+# Lives here rather than in a separate ruff.toml so that `ruff check .` picks
+# it up from the project root without extra arguments, and so the project has
+# a single canonical manifest.
+[tool.ruff]
+line-length = 90
+src = ["."]
+
+[tool.ruff.lint]
+select = [
+    "F",    # pyflakes
+    "E",    # pycodestyle errors
+    "W",    # pycodestyle warnings
+    "I",    # import sorting
+    "B",    # bugbear
+    "SIM",  # simplify
+    "RUF",  # ruff-specific
+    "ARG",  # unused arguments
+    "UP",   # pyupgrade
+    "BLE",  # blind except
+    "EXE",  # shebang / executable-bit consistency
+    "PL",   # pylint subset
+    "PTH",  # pathlib over os.path
+    "C4",   # comprehensions
+    "RET",  # return simplification
+    "TID",  # tidy imports
+]
+ignore = [
+    "E501",     # line length is the formatter's job
+    "SIM117",   # nested `with` reads better when asserting on the inner block
+    "PLR0913",  # entity constructors legitimately take many fields
+    "PLR2004",  # literal comparisons in tests are the point of the assertion
+]
+
+[tool.ruff.lint.per-file-ignores]
+# PLC0415: CLI subcommands import their engines lazily so that `--help` and
+#   the database commands do not pay for loading the analysis stack.
+"main.py" = ["PLC0415", "PLR0915"]
+# PLR09xx: `Pipeline.run` and `assess_risk` are linear procedures. Splitting
+#   them into helpers would scatter a sequence whose whole value is being
+#   readable end to end in one place.
+"decisions/pipeline.py" = ["PLR0911", "PLR0912", "PLR0915"]
+"signals/market.py" = ["PLR0912", "PLR0915"]
+# PLR0911: `_classify` is a lifecycle decision ladder. The order of the
+#   branches IS the policy -- kill before reduce, reduce before scale -- and a
+#   dispatch table would hide it.
+"part2/intelligence.py" = ["PLR0911"]
+# PLR0912: `main` is the validator's top-level sequence -- set up, run gates,
+#   clean up, report. Its branches are the optional flags; splitting further
+#   would scatter a procedure whose value is being readable in one place.
+"tools/validate.py" = ["PLR0912"]
+# PLR0911: `compare` is an evidence ladder -- GTIN beats model code beats
+#   similarity -- and the order of the returns IS the matching policy.
+"sourcing/matching.py" = ["PLR0911"]
+# PLR09xx: `build_candidate` is a validation ladder. Each return is one
+#   required supplier fact and the reason it was refused; the order is the
+#   contract, and a dispatch table would hide which field failed first.
+"sourcing/supplier_ingest.py" = ["PLR0911", "PLR0912"]
+# PLR09xx: `evaluate` is the compliance decision ladder. The order of the
+#   branches IS the policy -- FAIL beats UNKNOWN beats conflict beats stale
+#   ruleset beats missing-HSN beats clearance -- and splitting it would hide
+#   which condition decided the verdict.
+"compliance/engine.py" = ["PLR0912", "PLR0915"]
+# PLR0911: `classify` is the verdict ladder. Each early return is one hard
+#   gate -- compliance, headroom, economics, blockers -- and the order is the
+#   policy. Collapsing them would hide which gate decided the verdict.
+"sourcing/opportunities.py" = ["PLR0911"]
+# PLR09xx: `validate_draft` is a checklist of marketplace requirements. Each
+#   branch is one rule producing one structured finding; splitting it would
+#   scatter the contract across helpers for no gain in clarity.
+"marketplace/registry.py" = ["PLR0912", "PLR0915"]
+# PLR0911: `classify_status` is an HTTP status ladder. The order of the
+#   returns IS the failure policy -- 429 before the 4xx catch-all, 5xx split
+#   on idempotency -- and a lookup table would hide it.
+"part2/transport.py" = ["PLR0911"]
+# B008: `Depends()` in an argument default is FastAPI's dependency-injection
+#   idiom, not an accidental call. Rewriting it would break injection, which
+#   is what makes the endpoints testable.
+"api/app.py" = ["B008", "PLR0917"]
+# PLR0917: FastAPI declares query parameters as function arguments. A filter
+#   endpoint legitimately has several, and bundling them into a model would
+#   change the wire format for no gain.
+# PLC0415: test helpers import fixtures locally to keep each test readable
+#   as a self-contained unit.
+"tests/*" = ["ARG001", "ARG002", "PLR0917", "PLC0415"]
+# TypeDecorator.process_bind_param / process_result_value take `dialect` by
+# contract. SQLAlchemy calls them positionally, so the parameter cannot be
+# renamed or removed.
+"database/types.py" = ["ARG002"]
+# ARG002: LLMClient is a Protocol. Implementations must accept the full
+#   signature even when a particular one ignores an argument (NullLLMClient
+#   refuses before reading it; RecordedLLMClient has no token budget).
+"llm/services.py" = ["ARG002"]
+# ARG002: DiscoveryAdapter is likewise a Protocol; an adapter for a source
+#   with no legitimate access route accepts `limit` and returns nothing.
+"discovery/registry.py" = ["ARG002"]
+# PLC0415: openpyxl and pypdf are imported inside their reader functions so
+#   that importing `sources` does not pay for them, and so a missing optional
+#   format dependency reports which format it affects.
+"sources/ingest.py" = ["PLC0415"]
+
+
+[tool.ruff.lint.isort]
+known-first-party = [
+    "catalog", "compliance", "database", "decisions", "discovery", "econ",
+    "api", "execution", "ledger", "llm", "marketplace", "part2", "reference", "reports", "signals",
+    "research", "sourcing",
+    "sources",
+    "tools",
+]
+
+[tool.ruff.lint.flake8-tidy-imports]
+ban-relative-imports = "all"

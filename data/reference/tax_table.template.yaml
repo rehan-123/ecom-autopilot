@@ -1,0 +1,13 @@
+# GST / TCS reference - TEMPLATE, NOT VERIFIED DATA.
+# Enter rates from the CBIC schedules and record the source URL.
+kind: tax_table
+version: "template-0"
+effective_from: "2020-01-01T00:00:00+00:00"
+effective_to: null
+source: null
+last_verified_at: null
+payload:
+  default_gst_rate_pct: 0
+  tcs_rate_pct: 0
+  gst_rate_pct_by_hsn: {}
+  cess_pct_by_hsn: {}

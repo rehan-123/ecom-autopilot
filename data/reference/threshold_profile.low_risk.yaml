@@ -1,0 +1,22 @@
+# Business policy, not external fact. These are YOUR floors, so they are
+# verifiable by you and ship verified.
+kind: "threshold_profile:LOW"
+version: "policy-2026.08"
+effective_from: "2026-08-01T00:00:00+00:00"
+effective_to: null
+source: "operator policy"
+last_verified_at: "2026-08-23T00:00:00+00:00"
+payload:
+  min_net_margin_pct: 22
+  min_profit_per_order_inr: 60
+  max_return_rate_pct: 25
+  max_supplier_cost_pct: 35
+  max_ad_spend_pct: 12
+  min_roi_pct: 25
+  min_price_headroom_pct: 10
+  marginal_price_headroom_pct: 0
+  min_coverage_pct: 60
+  # Gate on the downside: a bad SKU costs inventory, capital, shelf-time and
+  # account metrics, while a good one only makes money.
+  require_worst_case_non_negative: true
+  worst_case_min_net_margin_pct: 0
